@@ -226,6 +226,7 @@ export const createSql = async (
 //};
 
 export async function runQuery(query: string): Promise<Record<string, any>[]> {
+  console.log({ query })
   try {
     const jdbc = new JDBC(config);
     const reservedConn = await jdbc.reserve()
