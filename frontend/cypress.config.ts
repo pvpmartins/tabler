@@ -7,7 +7,7 @@ dotenv.config()
 export default defineConfig({
   e2e: {
     env: {
-      nodeAppUrl: 'http://frontend-server:5173',
+      nodeAppUrl: true || 'http://frontend-server:5173',
     },
     defaultCommandTimeout: 30000,
     video: false,
