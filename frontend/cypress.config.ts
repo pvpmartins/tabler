@@ -7,7 +7,7 @@ dotenv.config()
 export default defineConfig({
   e2e: {
     env: {
-      nodeAppUrl: true || 'http://frontend-server:5173',
+      nodeAppUrl: 'http://frontend-server:5173',
     },
     defaultCommandTimeout: 30000,
     video: false,
@@ -20,21 +20,21 @@ export default defineConfig({
         async resetDatabaseTablesTest() {  // ✅ No need for an extra Promise wrapper
 
           try {
-            const createUsers = await runQuery('CREATE TABLE IF NOT EXISTS auth_users (username STRING, password STRING) USING DELTA LOCATION "/data/pv/auth_users";');
+            const createUsers = await runQuery('CREATE TABLE IF NOT EXISTS auth_users (id STRING, username STRING, password STRING) USING DELTA LOCATION "/data/pv/auth_users";');
             const deleteUsers = await runQuery('DELETE FROM auth_users;');
             const createGroups = await runQuery('CREATE TABLE IF NOT EXISTS auth_groups (id STRING, name STRING, create_table BOOLEAN , read_table BOOLEAN , update_table BOOLEAN , delete_table BOOLEAN ) USING DELTA LOCATION "/data/pv/auth_groups";');
             const deleteGroups = await runQuery('DELETE FROM auth_groups;');
             const createTables = await runQuery('CREATE TABLE IF NOT EXISTS tables (id STRING, name STRING, label STRING, cols ARRAY<STRUCT<id STRING, name STRING, field STRING, sortable BOOLEAN, header_name STRING, filter BOOLEAN, kind STRING, pivotIndex INTEGER, description STRING, regex STRING>>) USING DELTA LOCATION "/data/pv/tables";');
             const deleteTables = await runQuery('DELETE FROM tables;');
-            const createGroupsUsers = await runQuery('CREATE TABLE IF NOT EXISTS groups_users (id STRING,  table_from__id STRING, table_from__name STRING, table_to__id STRING, table_to__username STRING, edge_label STRING) USING DELTA LOCATION "/data/pv/groups_users";');
+            const createGroupsUsers = await runQuery('CREATE TABLE IF NOT EXISTS groups_users (id STRING, table_from__id STRING, table_from__name STRING, table_to__id STRING, table_to__username STRING, edge_label STRING) USING DELTA LOCATION "/data/pv/groups_users";');
             const deleteGroupsUsers = await runQuery('DELETE FROM groups_users;');
             const createMenu = await runQuery('CREATE TABLE IF NOT EXISTS menu (id STRING, tree_obj_str STRING) USING DELTA LOCATION "/data/pv/menu";');
             const deleteMenu = await runQuery('DELETE FROM menu;');
-            const createDashboards = await runQuery('CREATE TABLE IF NOT EXISTS dashboards (name STRING, owner STRING, state STRING, folder STRING) USING DELTA LOCATION "/data/pv/dashboards";');
+            const createDashboards = await runQuery('CREATE TABLE IF NOT EXISTS dashboards (id STRING, name STRING, owner STRING, state STRING, folder STRING) USING DELTA LOCATION "/data/pv/dashboards";');
             const deleteDashboards = await runQuery('DELETE FROM dashboards;');
-            const createTable1 = await runQuery('CREATE TABLE IF NOT EXISTS table_1 (username STRING, password STRING) USING DELTA LOCATION "/data/pv/table_1";');
+            const createTable1 = await runQuery('CREATE TABLE IF NOT EXISTS table_1 (id STRING, username STRING, password STRING) USING DELTA LOCATION "/data/pv/table_1";');
             const deleteTable1 = await runQuery('DELETE FROM table_1')
-            const createTable2 = await runQuery('CREATE TABLE IF NOT EXISTS table_2 (username STRING, password STRING) USING DELTA LOCATION "/data/pv/table_2";');
+            const createTable2 = await runQuery('CREATE TABLE IF NOT EXISTS table_2 (id STRING, username STRING, password STRING) USING DELTA LOCATION "/data/pv/table_2";');
             const deleteTable2 = await runQuery('DELETE FROM table_2')
 
             return { deleteGroups, deleteUsers };  // ✅ Directly return result
