@@ -134,5 +134,5 @@ services:
         # export DELTA_DB=delta-db:10000
         export FRONTEND_URL=http://frontend-server:5173        
         npx cypress install
-        npx cypress run -b chrome --spec "cypress/e2e/spec.cy.ts"
-        sleep 10000
+        npx cypress run -b chrome --spec "cypress/e2e/AuthGroups.cy.ts"
+        #sleep 10000
