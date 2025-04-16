@@ -19,14 +19,6 @@ export default defineConfig({
         },
         async resetDatabaseTablesTest() {  // ✅ No need for an extra Promise wrapper
 
-          const deleteTable = async (table: string) => {
-            try {
-
-            } catch (error) {
-
-            }
-
-          }
           try {
             const createUsers = await runQuery('CREATE TABLE IF NOT EXISTS auth_users (username STRING, password STRING) USING DELTA LOCATION "/data/pv/auth_users";');
             const deleteUsers = await runQuery('DELETE FROM auth_users;');
