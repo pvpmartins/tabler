@@ -24,7 +24,7 @@ export default defineConfig({
             const deleteUsers = await runQuery('DELETE FROM auth_users;');
             const createGroups = await runQuery('CREATE TABLE IF NOT EXISTS auth_groups (id STRING, name STRING, create_table BOOLEAN , read_table BOOLEAN , update_table BOOLEAN , delete_table BOOLEAN ) USING DELTA LOCATION "/data/pv/auth_groups";');
             const deleteGroups = await runQuery('DELETE FROM auth_groups;');
-            const createTables = await runQuery('CREATE TABLE IF NOT EXISTS tables (id STRING, name STRING, label STRING, cols ARRAY<STRUCT<id STRING, name STRING, field STRING, sortable BOOLEAN, header_name STRING, filter BOOLEAN, kind STRING, pivotIndex description STRING, regex STRING>>) USING DELTA LOCATION "/data/pv/tables";');
+            const createTables = await runQuery('CREATE TABLE IF NOT EXISTS tables (id STRING, name STRING, label STRING, cols ARRAY<STRUCT<id STRING, name STRING, field STRING, sortable BOOLEAN, header_name STRING, filter BOOLEAN, kind STRING, pivotIndex INTEGER, description STRING, regex STRING>>) USING DELTA LOCATION "/data/pv/tables";');
             const deleteTables = await runQuery('DELETE FROM tables;');
             const createGroupsUsers = await runQuery('CREATE TABLE IF NOT EXISTS groups_users (id STRING,  table_from__id STRING, table_from__name STRING, table_to__id STRING, table_to__username STRING, edge_label STRING) USING DELTA LOCATION "/data/pv/groups_users";');
             const deleteGroupsUsers = await runQuery('DELETE FROM groups_users;');
