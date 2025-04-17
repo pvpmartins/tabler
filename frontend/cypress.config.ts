@@ -7,7 +7,7 @@ dotenv.config()
 export default defineConfig({
   e2e: {
     env: {
-      nodeAppUrl: 'http://frontend-server:5173',
+      nodeAppUrl: process.env.FRONTEND_URL || 'http://frontend-server:5173',
     },
     defaultCommandTimeout: 30000,
     video: false,
@@ -44,10 +44,12 @@ export default defineConfig({
           }
         },
         async resetDatabaseUsers() {  // ✅ No need for an extra Promise wrapper
-          return null
           try {
+            const createUsers = await runQuery('CREATE TABLE IF NOT EXISTS auth_users (id STRING, username STRING, password STRING) USING DELTA LOCATION "/data/pv/auth_users";');
             const deleteUsers = await runQuery('DELETE FROM auth_users;');
+            const createGroups = await runQuery('CREATE TABLE IF NOT EXISTS auth_groups (id STRING, name STRING, create_table BOOLEAN , read_table BOOLEAN , update_table BOOLEAN , delete_table BOOLEAN ) USING DELTA LOCATION "/data/pv/auth_groups";');
             const deleteGroups = await runQuery('DELETE FROM auth_groups;');
+            const createGroupsUsers = await runQuery('CREATE TABLE IF NOT EXISTS groups_users (id STRING, table_from__id STRING, table_from__name STRING, table_to__id STRING, table_to__username STRING, edge_label STRING) USING DELTA LOCATION "/data/pv/groups_users";');
             const deleteGroupsUsers = await runQuery('DELETE FROM groups_users;');
 
             return { deleteGroups, deleteUsers };  // ✅ Directly return result

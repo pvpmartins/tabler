@@ -3,7 +3,7 @@ import { JDBC } from './node-jdbc/index';
 export const DELTA_DB = 'deltadb'
 
 export const classPath = process.env['CLASSPATH']?.split(',');
-const deltaDb = process.env.DELTA_DB
+const deltaDb = '172.18.0.4:10000' || process.env.DELTA_DB
 
 if (!Jinst.getInstance().isJvmCreated()) {
   Jinst.getInstance().addOption('-Xrs');

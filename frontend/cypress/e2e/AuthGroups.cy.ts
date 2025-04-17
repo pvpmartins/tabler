@@ -4,7 +4,7 @@ describe('Test Table (meta-data and data) CRUD', () => {
   // beforeEach(() => {
   //   cy.task('resetDatabase'); // Custom task to clear the DB
   // });
-  const url = 'http://frontend-server:5173' || Cypress.env('nodeAppUrl');
+  const url = Cypress.env('nodeAppUrl');
 
   before(() => {
     cy.log('FRONTEND_URL', { url })

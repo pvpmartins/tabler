@@ -59,7 +59,7 @@ const GridActionsPanel = ({
   onDelete,
   testId,
   changesMade,
-  updateModeOnRows,
+  updateModeOnRows = false,
   onUpdate,
   onEditOnGrid
 }: Props) => {
@@ -84,6 +84,10 @@ const GridActionsPanel = ({
       ?.offsetWidth;
     setCmpWidth(cmpWidth);
   }, [windowWidth]);
+
+  useEffect(() => {
+    console.log({ updateModeOnRows })
+  }, [updateModeOnRows])
 
 
   if (!!cmpWidth && cmpWidth < 514) {
@@ -292,7 +296,7 @@ const GridActionsPanel = ({
               setDeleteMode && setDeleteMode(true);
             }}
           >
-            {t('Delete Mode')}
+            {updateModeOnRows} {t('Delete Mode')}
           </button>
         ))}
       {(!deleteMode && permissions?.updateAction && !updateMode) && (
@@ -322,7 +326,8 @@ const GridActionsPanel = ({
         </label>
       </div>)}
 
-      {updateMode ||
+
+      {!updateModeOnRows && (updateMode ||
         deleteMode ||
         (permissions?.updateAction &&
           (changesMade && (
@@ -334,7 +339,7 @@ const GridActionsPanel = ({
             >
               <IoIosSave style={{ fontSize: '1.3rem' }} />
             </div>
-          )))}
+          ))))}
       {deleteMode && (
         <div
           style={{

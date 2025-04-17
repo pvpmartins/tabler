@@ -77,7 +77,7 @@ const CreateTableView = ({ testId }: Props) => {
       notificationManagerRef?.current?.addMessage(
         'success',
         t('Success'),
-        t('Table created'),
+        t('Table created') + "!",
       );
     } catch (error: any) {
       console.log({ error })
