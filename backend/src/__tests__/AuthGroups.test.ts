@@ -81,10 +81,11 @@ describe('dashboardCreatePOST', () => {
       runQuery(`DELETE FROM ${table};`)
     }
     process.env = OLD_ENV; // Restore old environment
+    srv.closeAllConnections()
     srv.close();
   });
 
-  it('should create a group', async () => {
+  it.only('should create a group', async () => {
     const createBody: AuthGroupCreateReq = {
       name: 'group1',
     };

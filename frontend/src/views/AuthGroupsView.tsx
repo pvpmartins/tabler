@@ -576,6 +576,7 @@ const DashboardAuthGroupsView = () => {
                 deleteAction: true,
                 updateAction: true,
               }}
+              updateModeOnRows={true}
               onParamsChange={handleParamsChange}
               paginationPageSize={16}
               isLoading={isLoading1}
@@ -598,6 +599,7 @@ const DashboardAuthGroupsView = () => {
             <PVGridWebiny2
               add={() => setAddDashboard(true)}
               cols={cols}
+
               cypressAtt="group-dashboards-grid"
               rows={dashboards}
               isLoading={isLoading2}
@@ -611,7 +613,7 @@ const DashboardAuthGroupsView = () => {
               }}
               editOnGrid={false}
               onParamsChange={handleGroupDashboards}
-              updateModeOnRows={true}
+              updateModeOnRows={false}
               totalCount={totalDashboards}
               onUpdate={updateAuthGroupDash}
               onRowsSelected={(e) => {

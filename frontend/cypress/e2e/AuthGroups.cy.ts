@@ -4,8 +4,11 @@ describe('Test Table (meta-data and data) CRUD', () => {
   // beforeEach(() => {
   //   cy.task('resetDatabase'); // Custom task to clear the DB
   // });
-  const url = 'http://172.19.0.4:5173'
+  const url = Cypress.env('nodeAppUrl');
+
   before(() => {
+    cy.log('FRONTEND_URL', { url })
+    console.log({ FRONTEND_URL: url })
     cy.task('resetDatabaseAuthGroups').then((result) => {
       cy.log('Database reset result:', JSON.stringify(result));
     });
@@ -38,6 +41,7 @@ describe('Test Table (meta-data and data) CRUD', () => {
     cy.contains('Logout').click()
   }),
     beforeEach(() => {
+      cy.log('FRONTEND_URL', { url })
       cy.visit(`${url}/login`);
       cy.get("[data-cy='username-login-input']").type("Admin 1");
       cy.get("[data-cy='password-login-input']").type("1234567");
@@ -48,6 +52,7 @@ describe('Test Table (meta-data and data) CRUD', () => {
 
     })
   it('should associate user to group and group to dashboards', () => {
+    cy.log('FRONTEND_URL', { url })
     cy.visit(`${url}/auth/groups`)
 
     cy.get("[data-cy='edit-on-grid-toggle']").click()

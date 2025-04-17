@@ -11,14 +11,14 @@ interface ConnStatus {
 }
 
 export interface PoolConnObj {
-    uuid: string;
-    conn: Connection;
-    keepalive: number | false | NodeJS.Timeout;
-    lastIdle: number | undefined ;
-  }
+  uuid: string;
+  conn: Connection;
+  keepalive: number | false | NodeJS.Timeout;
+  lastIdle: number | undefined;
+}
 
 interface KeepAliveConfig {
-  enabled: boolean ;
+  enabled: boolean;
   interval: number; // in milliseconds
   query: string;
 }
@@ -42,7 +42,7 @@ export interface PoolConfig {
 
 interface PoolStatus {
   available?: number
- reserved?: number 
+  reserved?: number
   pool?: ConnStatus[]
   rpool?: ConnStatus[],
 }
@@ -58,7 +58,7 @@ interface PoolConnStatus {
 
 const java = Jinst.getInstance();
 
-export interface IConnection extends PoolConnObj, Connection {}
+export interface IConnection extends PoolConnObj, Connection { }
 
 
 if (!Jinst.getInstance().isJvmCreated()) {
@@ -114,7 +114,7 @@ const addConnection = async (
 const addConnectionSync = (
   url: string,
   props: any,
-  ka: { enabled: boolean ; interval: number; query: string },
+  ka: { enabled: boolean; interval: number; query: string },
   maxIdle: number | null
 ) => {
   const conn = dm.getConnectionSync(url, props);
@@ -124,7 +124,7 @@ const addConnectionSync = (
     keepalive: ka.enabled
       ? setInterval(keepalive, ka.interval, conn, ka.query)
       : false,
-      lastIdle: undefined
+    lastIdle: undefined
   };
 
   if (maxIdle) {
@@ -189,31 +189,31 @@ class Pool {
   }
 
   private async connStatus(acc: ConnStatus[], pool: PoolConnStatus[]): Promise<ConnStatus[]> {
-    return pool.reduce((conns, connobj) => {
-        const conn = connobj.conn;
-        const closed = conn.isClosedSync() as boolean;
-        const readonly = conn.isReadOnlySync();
-        const valid = conn.isValidSync(1000);
-        
-        conns.push({
-            uuid: connobj.uuid,
-            closed,
-            readonly,
-            valid,
-        });
-        
-        return conns;
-    }, acc);
-}
+    for (const connobj of pool) {
+      const conn = connobj.conn;
+      const closed = await conn.isClosed() as boolean;
+      const readonly = conn.isReadOnlySync();
+      const valid = conn.isValidSync(1000);
 
-private async _addConnectionsOnInitialize(): Promise<void> {
+      acc.push({
+        uuid: connobj.uuid,
+        closed,
+        readonly,
+        valid,
+      });
+    }
+
+    return acc;
+  }
+
+  private async _addConnectionsOnInitialize(): Promise<void> {
     const conns = await Promise.all(
-        Array.from({ length: this._minpoolsize }, () =>
-            addConnection(this._url, this._props, this._keepalive, this._maxidle)
-        )
+      Array.from({ length: this._minpoolsize }, () =>
+        addConnection(this._url, this._props, this._keepalive, this._maxidle)
+      )
     );
     this._pool.push(...conns);
-}
+  }
 
 
 
@@ -241,7 +241,7 @@ private async _addConnectionsOnInitialize(): Promise<void> {
     }
   }
 
-  async reserve(): Promise<{[key: string]: any,conn: IConnection}> {
+  async reserve(): Promise<{ [key: string]: any, conn: IConnection }> {
     this._closeIdleConnections();
 
     let conn = null;
@@ -295,31 +295,31 @@ private async _addConnectionsOnInitialize(): Promise<void> {
     for (let i = array.length - 1; i >= 0; i--) {
       const conn = array[i];
       if (typeof conn === "object" && conn.conn !== null) {
-        if(!conn.lastIdle) return
+        if (!conn.lastIdle) return
         if (conn.lastIdle < maxLastIdle) {
           conn.conn.close();
           array.splice(i, 1);
         }
-       }
+      }
     }
   }
 
   async release(conn: PoolConnObj): Promise<void> {
     if (typeof conn === "object") {
-        const uuid = conn.uuid;
+      const uuid = conn.uuid;
 
-        // Use native filter instead of Lodash's reject
-        this._reserved = this._reserved.filter(reservedConn => reservedConn.uuid !== uuid);
+      // Use native filter instead of Lodash's reject
+      this._reserved = this._reserved.filter(reservedConn => reservedConn.uuid !== uuid);
 
-        if (conn.lastIdle) {
-            conn.lastIdle = Date.now(); // Using Date.now() for better performance
-        }
-        
-        this._pool.unshift(conn); // Add the connection back to the pool
+      if (conn.lastIdle) {
+        conn.lastIdle = Date.now(); // Using Date.now() for better performance
+      }
+
+      this._pool.unshift(conn); // Add the connection back to the pool
     } else {
-        throw new Error("INVALID CONNECTION");
+      throw new Error("INVALID CONNECTION");
     }
-}
+  }
 
   async purge(): Promise<void> {
     const conns = [...this._pool, ...this._reserved];
@@ -328,7 +328,7 @@ private async _addConnectionsOnInitialize(): Promise<void> {
       conns.map((conn) => {
         if (typeof conn === "object" && conn.conn !== null) {
           return new Promise<void>((resolve) => {
-            conn.conn.close(() => resolve());
+            conn.conn.closeSync(() => resolve());
           });
         } else {
           return Promise.resolve();

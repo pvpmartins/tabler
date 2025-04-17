@@ -2,7 +2,7 @@ describe('Test Table (meta-data and data) CRUD', () => {
   // beforeEach(() => {
   //   cy.task('resetDatabase'); // Custom task to clear the DB
   // });
-  const url = 'http://172.19.0.4:5173'
+  const url = Cypress.env('nodeAppUrl');
   before(() => {
     cy.task('resetDatabaseTablesTest').then((result) => {
       cy.log('Database reset result:', JSON.stringify(result));

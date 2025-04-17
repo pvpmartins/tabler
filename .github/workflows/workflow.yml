@@ -1,0 +1,68 @@
+name: Docker Compose Workflow
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-with-docker-compose:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checking UID
+        run: |
+          whoami
+          id -u
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.26.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose version
+
+      - name: Clean Docker Volumes and Cache
+        run: |
+          docker volume prune -f
+          sudo rm -rf ./backend/delta-table/work-dir/metastore_db
+          sudo rm -f ./backend/delta-table/work-dir/derby.log    
+
+      - name: Fix permissions for delta-table/data and delta-table/work-dir/metastore_db 
+        run: |
+          ls -latr ./backend/delta-table/work-dir
+          mkdir -p ./backend/delta-table/data
+          chmod -R 777 ./backend/delta-table/data
+          chmod -R 777 ./backend/delta-table/work-dir/
+
+      - name: Start Services in Background
+        run: |
+          docker-compose up --abort-on-container-exit --exit-code-from app
+
+          #      - name: Checking UID
+          #        run: |
+          #          docker-compose exec delta-db bash -c "id -u"
+          #
+          #      - name: Wait for Services and Run Tests
+          #        run: |
+          #          echo "Waiting for delta-db to open port 10000..."
+          #          timeout 200 bash -c 'until docker exec delta-db bash -c "ls /opt/spark/logs" > /dev/null 2>&1; do echo "Still waiting..."; sleep 2; done'
+          #          echo "Service seems ready. Running tests..."
+          #
+          #          docker-compose exec app bash -c 'npm run test || exit 1'
+          #
+          #      - name: Show Spark Logs from delta-db
+          #        if: always()
+          #        run: |
+          #          echo "Showing logs from /opt/spark/logs in delta-db..."
+          #          docker-compose exec delta-db bash -c 'ls -l /opt/spark/logs && echo && cat /opt/spark/logs/* || echo "⚠️ No logs found"'
+
+      - name: Tear Down
+        if: always()
+        run: |
+          docker-compose down

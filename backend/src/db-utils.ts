@@ -16,7 +16,7 @@ if (!Jinst.getInstance().isJvmCreated()) {
 }
 
 export const config = {
-  url: process.env['P_DELTA_TABLE_HIVE_SERVER'] || 'jdbc:hive2://localhost:10000', // Update the connection URL according to your setup
+  url: 'jdbc:hive2://delta-db:10000', // Update the connection URL according to your setup
   drivername: 'org.apache.hive.jdbc.HiveDriver', // Driver class name
   properties: {
     user: 'NBuser',
@@ -42,7 +42,6 @@ const pool = new Pool({
     level: 'info'
   }
 });
-const jdbc = new JDBC(config);
 
 // Initialize pool
 async function initializePool() {
@@ -54,9 +53,6 @@ async function initializePool() {
   }
 }
 
-(async () => {
-  await initializePool();
-})();
 
 export const convertToSqlFields = (data: any[]): string => {
   const fields = [];
@@ -226,14 +222,16 @@ export const createSql = async (
   return res3;
 };
 
-export const createConnection = async (): Promise<IConnection> => {
-  const reservedConn = await jdbc.reserve()
-  return reservedConn.conn
-};
+//export const createConnection = async (): Promise<IConnection> => {
+//};
 
 export async function runQuery(query: string): Promise<Record<string, any>[]> {
+  console.log({ query })
   try {
-    const connection = await createConnection();
+    const jdbc = new JDBC(config);
+    const reservedConn = await jdbc.reserve()
+    const connection = reservedConn.conn
+    //const connection = await createConnection();
     const preparedStatement = await connection.prepareStatement(query); // Replace `your_table` with your actual table name
 
     const resultSet = await preparedStatement.executeQuery();
@@ -243,6 +241,9 @@ export async function runQuery(query: string): Promise<Record<string, any>[]> {
     // await pool.release(connection)
 
     await connection.close()
+    await jdbc.release(connection)
+
+    //console.log({ JDBCStatus: await jdbc.status() })
 
     return results
   } catch (error) {

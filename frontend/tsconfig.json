@@ -42,7 +42,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
   },
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "./src/", "./cypress/", "./node_modules/", "./cypress.config.ts", "./vite.config.ts"],
   "include": ["."],
   "ts-node": {
    "esm": true,

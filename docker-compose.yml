@@ -1,0 +1,138 @@
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: node-app
+    ports:
+      - "8080:8080"
+      - "3001:3001"
+    depends_on:
+      - delta-db
+    environment:
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
+      COSMOSDB_NAME: pv_db
+      CLASSPATH: "/usr/src/app/delta-table/node/jars/*"
+      AZURE_COSMOS_EMULATOR_IP_ADDRESS_OVERRIDE: 127.0.0.1
+      PORT: 5000
+      JWT_SECRET_KEY: 2d49959562a7d8718d0370b09fd96d6f13b00af81fdf7d353aa96b1d975ba687
+      REFRESH_JWT_SECRET_KEY: 5875bb587efd0b6aa7d00b6b37ec210941e0c05034afcd4e8d8680137c53d2dd
+      ADMIN_PASSWORD: admin
+      USER_PASSWORD: user
+      DB_SOURCE: deltadb
+      LD_LIBRARY_PATH: /usr/lib/jvm/java-1.17.0-openjdk-amd64/lib/server:/usr/lib/jvm/java-1.17.0-openjdk-amd64/lib
+      P_DELTA_TABLE_HIVE_SERVER: jdbc:hive2://delta-db:10000 
+      FERN_TOKEN: fern_ZD6VQEU7lX3IrebxoIsjYmLuolVUd8-N
+    volumes:
+      - ./backend:/usr/src/app
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    entrypoint:
+      - /usr/bin/bash
+      - -c
+      - |
+        if [[ ! -f "src/generated/index.js" ]] ; then  fern generate ; fi
+        echo "Checking if service is up on port 10000..."
+        timeout 1000 bash -c 'until nc -z delta-db 10000; do echo "Waiting for port 10000..."; sleep 1; done; echo "Port 10000 is open!"'
+        cd delta-table
+        npm i -g java --unsafe-perm
+        cd ..
+        npm install
+        cd pontus-node-jdbc
+        npm install
+        cd ..
+        export CLASSPATH="$(ls /usr/src/app/delta-table/node/jars/*|xargs|sed -e 's/ /,/g' )"
+        cd delta-table/node/node-jdbc
+        npm i
+        cd ..
+        npm install
+        # npm run jest
+        cd ../..
+        cd pontus-node-jdbc
+        npm run build
+        # npm run jest || true
+        cd /usr/src/app
+        chmod +x /usr/src/app/run-docker.sh
+        ./run-docker.sh 
+        source /usr/src/app/run-docker.sh
+        echo "CLASSPATH VARIABLE"
+        echo $CLASSPATH
+        echo 'LS'
+        ls
+        # npm run jest src/__tests__/AuthGroups.test.ts --forceExit
+        npm run build && node dist/src/server.js
+        #       sleep 1000000
+
+  delta-db:
+    image: pontusvisiongdpr/pv-deltadb:latest
+    #    build:
+    #      context: ./backend/delta-table/docker/
+    #      dockerfile: Dockerfile
+    #user: "1001:1001"
+    volumes:
+      - ./backend/delta-table/data:/data 
+      - ./backend/delta-table/work-dir:/opt/spark/work-dir
+      # - spark-workdir:/opt/spark/work-dir
+    environment:
+      - CLASSPATH=/opt/spark/jars/*
+    ports:
+      - "10000:10000"
+      - "8888:8888"
+
+  frontend-server:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "4173:4173"
+      - "5173:5173"
+    environment:
+      VITE_BACKEND_URL: http://node-app:8080 # pointing to the backend
+      LD_LIBRARY_PATH: /usr/lib/jvm/java-1.17.0-openjdk-amd64/lib/server:/usr/lib/jvm/java-1.17.0-openjdk-amd64/lib 
+    volumes:
+      - ./frontend:/usr/src/app
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /root/.cache/Cypress:/root/.cache/Cypress
+      #  depends_on:
+      #    - app
+    entrypoint:
+      - /usr/bin/bash
+      - -c
+      - |
+        VITE_BACKEND_URL=http://node-app:8080 
+        timeout 1000 bash -c 'until nc -z node-app 8080; do echo "Waiting for port 8080..."; sleep 1; done; echo "Port 8080 is open!"'
+        echo "Checking if service is up on port 10000..."
+        npm install
+        sass src/sass/style.scss src/style.css
+        npm run dev
+
+  frontend-tests:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    environment:
+      FRONTEND_URL: http://frontend-server:5173 # pointing to the backend
+      LD_LIBRARY_PATH: /usr/lib/jvm/java-1.17.0-openjdk-amd64/lib/server:/usr/lib/jvm/java-1.17.0-openjdk-amd64/lib 
+      DELTA_DB: delta-db:10000 # pointing to the backend
+    volumes:
+      - ./frontend:/usr/src/app
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /root/.cache/Cypress:/root/.cache/Cypress
+      #  depends_on:
+      #    - app
+    entrypoint:
+      - /usr/bin/bash
+      - -c
+      - |
+        timeout 1000 bash -c 'until nc -z frontend-server 5173; do echo "Waiting for port 5173..."; sleep 1; done; echo "Port 5173 is open!"'
+        echo "Checking if service is up on port 10000..."
+        timeout 1000 bash -c 'until nc -z delta-db 10000; do echo "Waiting for port 10000..."; sleep 1; done; echo "Port 10000 is open!"'
+        npm install
+        rm -Rf dist && npx tsc
+        export CLASSPATH="$(ls /usr/src/app/node-jdbc/node/jars/* | xargs | sed -e 's/ /,/g')"
+        # export DELTA_DB=delta-db:10000
+        export FRONTEND_URL=http://frontend-server:5173        
+        npx cypress install
+        npx cypress run -b chrome
+        #sleep 10000

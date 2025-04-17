@@ -156,18 +156,18 @@ const httpTrigger = async (
     status: ret.status,
   };
 
-  srv.closeIdleConnections();
+  //  srv.closeIdleConnections();
 
   return resp;
 
 
 };
 
-azureApp.http('httpTrigger', {
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  authLevel: 'function',
-  handler: httpTrigger,
-});
+//azureApp.http('httpTrigger', {
+//  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//  authLevel: 'function',
+//  handler: httpTrigger,
+//});
 
 export default httpTrigger;
 

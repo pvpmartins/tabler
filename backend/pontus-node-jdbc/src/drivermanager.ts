@@ -41,9 +41,9 @@ const driverManager: DriverManager = {
     );
 
     const validArgs =
-    args[0] &&
-    // propsoruser and password can both be falsey
-    (!(args[1] || args[2]) ||
+      args[0] &&
+      // propsoruser and password can both be falsey
+      (!(args[1] || args[2]) ||
         // propsoruser and password can both be strings
         (typeof args[1] === 'string' && typeof args[2] === 'string') ||
         // propsoruser can be an object if password is falsey
@@ -55,7 +55,7 @@ const driverManager: DriverManager = {
     }
 
     return new Promise((resolve, reject) => {
-    
+
       resolve(java.callStaticMethodSync.apply(java, [DM, "getConnection", ...args]));
     });
   },
@@ -70,8 +70,8 @@ const driverManager: DriverManager = {
     ) as DriverManagerArgs;
 
     const validArgs =
-    args[0] &&
-    (!(args[1] || args[2]) ||
+      args[0] &&
+      (!(args[1] || args[2]) ||
         (typeof args[1] === 'string' && typeof args[2] === 'string') ||
         (typeof args[1] === 'object' && args[1] !== null && !args[2]));
 

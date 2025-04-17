@@ -17,5 +17,4 @@ package-lock.json
 src/generated/
 src/typescript/
 src/openapi/
-delta-table/work-dir
 delta-table/node/.tool-versions

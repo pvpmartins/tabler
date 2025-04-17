@@ -1,0 +1,5 @@
+FROM pontusvisiongdpr/pv-deltadb:latest
+
+USER root
+
+RUN apt-get update && apt-get install -y rsync openssh-client

@@ -63,7 +63,7 @@ RUN apt -qq -y install vim curl tree less
 #FROM deltaio/delta-docker:latest
 USER root
 RUN apt -y update && \
-    apt -y install jq
+    apt -y install jq net-tools
 
 RUN curl -sL https://deb.nodesource.com/setup_20.x | bash - && \
     apt install nodejs -y && \

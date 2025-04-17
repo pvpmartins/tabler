@@ -27,6 +27,9 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173,
+    cors: true,
+    strictPort: true,
+    origin: 'http://frontend-server:5173',
   },
   plugins: [react()],
   // base: '/app_dist',

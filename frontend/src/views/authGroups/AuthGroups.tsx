@@ -39,6 +39,7 @@ type Props = {
   onRowsStateChange?: (data: Record<string, any>[]) => void;
   onCellsChange?: (data: CellValueChangedEvent[]) => void;
   paginationPageSize?: number
+  updateModeOnRows?: boolean
 };
 
 const AuthGroups = ({
@@ -51,6 +52,7 @@ const AuthGroups = ({
   onRefresh,
   onRowsStateChange,
   onUpdate,
+  updateModeOnRows,
   selection,
   permissions,
   selectRowByCell,
@@ -144,7 +146,7 @@ const AuthGroups = ({
       notificationManagerRef?.current?.addMessage(
         'success',
         t('Success'),
-        t(`AuthGroup(s) created`),
+        t(`AuthGroup(s) created`) + "!",
       );
 
       await fetchAuthGroups();
@@ -268,7 +270,7 @@ const AuthGroups = ({
         onParamsChange={onParamsChange}
         isLoading={isLoading1}
         onRowsSelected={onRowsSelected}
-        updateModeOnRows={true}
+        updateModeOnRows={updateModeOnRows}
         onCreateRow={e => addGroup({ name: e.name })}
         onUpdate={updateGroups}
         resetRowsChangedState={reset}

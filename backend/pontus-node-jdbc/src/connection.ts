@@ -38,10 +38,10 @@ type ConnectionType = {
     rstype: number,
     rsconcurrency: number,
     rsholdability: number)
-     => void;
+    => void;
   prepareStatement: (
     sql: string,
-    arg1?: Record<string, any|any[]>
+    arg1?: Record<string, any | any[]>
   ) => void;
   prepareStatementSync: (
     sql: string,
@@ -71,11 +71,11 @@ type ConnectionType = {
     txniso: number
   ) => void;
   setTypeMap: (map: any) => void;
-  getAutoCommitSync:() => boolean
-  getCatalogSync:() => Promise<string>
-  clearWarningsSync:() => Promise<void>
-  closeSync:() => Promise<void>
-  getClientInfoSync:(name: string) => string 
+  getAutoCommitSync: () => boolean
+  getCatalogSync: () => Promise<string>
+  clearWarningsSync: () => Promise<void>
+  closeSync: () => Promise<void>
+  getClientInfoSync: (name: string) => string
   getHoldabilitySync(): number;
   getMetaDataSync(): any;
   getNetworkTimeoutSync(): number;
@@ -110,7 +110,7 @@ type ConnectionType = {
   setTypeMapSync(map: any): void;
   commitSync(): Promise<void>
   createStatementSync(arg1?: number, arg2?: number, arg3?: number): Promise<any>
-  abortSync:(executor: any) => void
+  abortSync: (executor: any) => void
 };
 
 class Connection {
@@ -155,15 +155,15 @@ class Connection {
     return txniso;
   }
 
-  isClosedSync(): boolean{
+  isClosedSync(): boolean {
     return this.isClosedSync()
   }
 
-  isReadOnlySync():boolean {
+  isReadOnlySync(): boolean {
     return this.isReadOnlySync()
   }
 
-  isValidSync(val: number):boolean {
+  isValidSync(val: number): boolean {
     return this.isValidSync(val)
   }
 
@@ -172,8 +172,8 @@ class Connection {
   };
 
   async abort(): Promise<void> {
-    const executor = this.asyncExecutor(() => {});
-  
+    const executor = this.asyncExecutor(() => { });
+
     try {
       if (this._conn?.abortSync) {
         await this._conn.abortSync(executor);
@@ -281,7 +281,7 @@ class Connection {
       try {
         resolve(this._conn?.getHoldabilitySync());
       } catch (error) {
-        reject(error) 
+        reject(error)
       }
     });
   }
@@ -355,7 +355,7 @@ class Connection {
       }
     });
   }
-  isReadOnly(): Promise<boolean | undefined > {
+  isReadOnly(): Promise<boolean | undefined> {
     return new Promise((resolve, reject) => {
       try {
         resolve(this._conn?.isReadOnlySync())
@@ -385,7 +385,7 @@ class Connection {
       try {
         resolve(this._conn?.prepareCallSync(sql, rstype, rsconcurrency, rsholdability))
       } catch (error) {
-        reject(error) 
+        reject(error)
       }
     });
   }
@@ -403,7 +403,7 @@ class Connection {
   //     if (!sql) {
   //       return reject(new Error('INVALID ARGUMENTS'));
   //     }
-  
+
   //     // Validate additional arguments (arg1, arg2, arg3)
   //     const validateArgs = (args: any[]): boolean => {
   //       return args.every((arg, idx) => {
@@ -413,7 +413,7 @@ class Connection {
   //         return typeof arg === 'number';
   //       });
   //     };
-  
+
   //     // Collect only defined arguments
   //     const args = [sql, arg1, arg2, arg3].filter(arg => arg !== undefined) as [
   //       string,
@@ -421,11 +421,11 @@ class Connection {
   //       number?,
   //       number?
   //     ];
-  
+
   //     if (!validateArgs(args.slice(1))) {
   //       return reject(new Error('INVALID ARGUMENTS'));
   //     }
-  
+
   //     // Call `prepareStatement` with explicit arguments and a callback for handling the result
   //     this._conn?.prepareStatement(
   //       args[0],
@@ -445,40 +445,40 @@ class Connection {
 
   prepareStatement = (
     sql: string,
-    arg1?: Record<string, any | any[]>  
+    arg1?: Record<string, any | any[]>
 
-  ):Promise<PreparedStatement>=> {
+  ): Promise<PreparedStatement> => {
 
-    return new Promise((resolve, reject)=>{
- 
-    // Check arg1, arg2, and arg3 for validity.  These arguments must
-    // be numbers if given, except for the special case when the first
-    // of these arguments is an array and no other arguments are given.
-    // In this special case, the array must be a string or number array.
-    //
-    // NOTE: _.tail returns all but the first argument, so we are only
-    // processing arg1, arg2, and arg3; and not sql (or callback, which
-    // was already removed from the args array).
-  
-    // if (invalidArgs) {
-    //   return reject(new Error(errMsg));
-    // }
-  
-    // Push a callback handler onto the arguments
-    // args.push(function (err, ps) {
-    //   if (err) {
-    //     return callback(err);
-    //   } else {
-    //     return callback(null, new PreparedStatement(ps));
-    //   }
-    // });
-  
-    // Forward modified arguments to _conn.prepareStatement
-    try {
-      resolve(new PreparedStatement(this._conn?.prepareStatementSync(sql))); 
-    } catch (error) {
-      reject(error) 
-    }
+    return new Promise((resolve, reject) => {
+
+      // Check arg1, arg2, and arg3 for validity.  These arguments must
+      // be numbers if given, except for the special case when the first
+      // of these arguments is an array and no other arguments are given.
+      // In this special case, the array must be a string or number array.
+      //
+      // NOTE: _.tail returns all but the first argument, so we are only
+      // processing arg1, arg2, and arg3; and not sql (or callback, which
+      // was already removed from the args array).
+
+      // if (invalidArgs) {
+      //   return reject(new Error(errMsg));
+      // }
+
+      // Push a callback handler onto the arguments
+      // args.push(function (err, ps) {
+      //   if (err) {
+      //     return callback(err);
+      //   } else {
+      //     return callback(null, new PreparedStatement(ps));
+      //   }
+      // });
+
+      // Forward modified arguments to _conn.prepareStatement
+      try {
+        resolve(new PreparedStatement(this._conn?.prepareStatementSync(sql)));
+      } catch (error) {
+        reject(error)
+      }
     })
   };
 
@@ -494,12 +494,12 @@ class Connection {
 
   rollback(savepoint?: any): Promise<void> {
     return new Promise((resolve, reject) => {
-        try {
-          resolve(this._conn?.rollbackSync(savepoint));
-        } catch (error) {
-          reject(error)
-        }
-      
+      try {
+        resolve(this._conn?.rollbackSync(savepoint));
+      } catch (error) {
+        reject(error)
+      }
+
     });
   }
 
@@ -562,14 +562,14 @@ class Connection {
       }
     });
   }
-  
+
   setSchema(schema: string): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
         resolve(this._conn?.setSchemaSync(schema));
-        
+
       } catch (error) {
-        reject(error) 
+        reject(error)
       }
     });
   }
@@ -578,9 +578,9 @@ class Connection {
     return new Promise((resolve, reject) => {
       try {
         resolve(this._conn?.setTransactionIsolationSync(txniso));
-        
+
       } catch (error) {
-        reject(error) 
+        reject(error)
       }
     });
   }
@@ -590,7 +590,7 @@ class Connection {
       try {
         resolve(this._conn?.setTypeMapSync(map));
       } catch (error) {
-        reject(error) 
+        reject(error)
       }
     });
   }
